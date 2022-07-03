@@ -1,0 +1,11 @@
+repo:
+- ca-certificates
+- curl
+- gnupg 
+- lsb-release
+
+docker:
+- docker-ce
+- docker-ce-cli
+- containerd.io
+- docker-compose-plugin

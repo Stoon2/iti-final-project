@@ -1,0 +1,63 @@
+- name: installing docker and minikube
+  hosts: grad
+  remote_user: ubuntu
+  tasks:
+  - name: update all pkgs
+    ansible.builtin.apt:
+      update_cache: yes
+
+  - name: install packages to allow apt to use a repository over HTTPS 
+    ansible.builtin.apt:
+      name: "{{ item }}"
+      state: present
+    loop: "{{ repo }}"
+
+  - name: create dir
+    file:
+      path: /etc/apt/keyrings
+      state: directory
+      recurse: yes
+
+  - name: Docker's official GPG key
+    shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+  - name: setup repo
+    shell: echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+  - name: update pkgs
+    ansible.builtin.apt:
+      update_cache: yes
+
+  - name: install docker
+    ansible.builtin.apt:
+      name: "{{ item }}"
+      state: present
+    loop: "{{ docker }}"
+    notify: 
+    - start and enable docker
+
+  - name: add ubuntu user to docker group
+    user:
+      name: ubuntu
+      groups: docker
+
+  - name: install minikube
+    ansible.builtin.apt:
+      deb: https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
+      state: present
+    notify: 
+    - start minikube
+
+  
+  handlers:
+    - name: start and enable docker
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: start minikube
+      shell: minikube start
+      become: no
+
+    
