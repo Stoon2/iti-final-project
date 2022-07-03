@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grad-dep-env
+  namespace: dev
+data:
+  HOST: mysql-svc.dev.svc.cluster.local
+  USERNAME: grad
+  DATABASE: test

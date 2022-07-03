@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grad-dep
+  namespace: dev
+  labels:
+    app: grad-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grad-dep
+  template:
+    metadata:
+      labels:
+        app: grad-dep
+    spec:
+      containers:
+      - name: grad-dep
+        image: zainabsabry/test-grad:1.0
+        ports:
+        - containerPort: 3000
+        env:
+        - name: PASSWORD 
+          valueFrom:
+            secretKeyRef:
+              name: root-password
+              key: mysql_root_password
+        - name: USERNAME
+          valueFrom:
+            configMapKeyRef:
+              name: grad-dep-env
+              key: USERNAME
+        - name: DATABASE
+          valueFrom:
+            configMapKeyRef:
+              name: grad-dep-env
+              key: DATABASE
+        - name: HOST
+          valueFrom:
+            configMapKeyRef:
+              name: grad-dep-env
+              key: HOST
