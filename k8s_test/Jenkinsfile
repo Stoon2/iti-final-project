@@ -1,0 +1,25 @@
+pipeline {
+
+  options {
+    ansiColor('xterm')
+  }
+
+  agent {
+    kubernetes {
+      yamlFile 'k8s_test/builder.yaml'
+    }
+  }
+
+  stages {
+    stage('Deploy App to Kubernetes') {   
+      steps {
+        container('kubectl') {
+          withCredentials([file(credentialsId: 'mykubeconfig', variable: 'KUBECONFIG')]) {
+            sh 'kubectl apply -f k8s_test/test.yaml'
+          }
+        }
+      }
+    }
+  
+  }
+}
