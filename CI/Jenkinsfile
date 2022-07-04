@@ -1,0 +1,61 @@
+pipeline {
+
+  options {
+    ansiColor('xterm')
+  }
+
+  agent {
+    kubernetes {
+      yamlFile 'CI/builder.yaml'
+    }
+  }
+
+  stages {
+
+    stage('Kaniko Build & Push Image') {
+      steps {
+        container('kaniko') {
+          script {
+            sh '''
+            /kaniko/executor --dockerfile `pwd`/app/Dockerfile \
+                             --context `pwd`/app \
+                             --destination=zainabsabry/test:${BUILD_NUMBER}
+            '''
+          }
+        }
+      }
+    }
+
+    // stage('Upload image to nexus') {
+    //   steps {
+    //     nexusArtifactUploader {
+    //       nexusVersion('nexus3')
+    //       protocol('http')
+    //       nexusUrl('192.168.49.2:31729')
+    //       groupId('sp.sd')
+    //       version('3.40.1')
+    //       repository('docker-hosted')
+    //       credentialsId('nexus')
+    //       artifact {
+    //           artifactId('grad-app')
+    //           type('docker')
+    //           classifier('')
+    //           file('test:${BUILD_NUMBER}')
+    //       }
+    //   }
+    //   }
+    // }
+
+    // stage('Deploy App to Kubernetes') {     
+    //   steps {
+    //     container('kubectl') {
+    //       withCredentials([file(credentialsId: 'mykubeconfig', variable: 'KUBECONFIG')]) {
+    //         sh 'sed -i "s/<TAG>/${BUILD_NUMBER}/" myweb.yaml'
+    //         sh 'kubectl apply -f myweb.yaml'
+    //       }
+    //     }
+    //   }
+    // }
+  
+  }
+}

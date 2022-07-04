@@ -6,7 +6,7 @@ pipeline {
 
   agent {
     kubernetes {
-      yamlFile 'k8s_test/builder.yaml'
+      yamlFile 'CI/builder.yaml'
     }
   }
 
@@ -15,7 +15,7 @@ pipeline {
       steps {
         container('kubectl') {
           withCredentials([file(credentialsId: 'mykubeconfig', variable: 'KUBECONFIG')]) {
-            sh 'kubectl apply -f k8s_test/test.yaml'
+            sh 'kubectl apply -f k8s/'
           }
         }
       }
