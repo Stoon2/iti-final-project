@@ -15,9 +15,10 @@ spec:
       labels:
         app: grad-dep
     spec:
+
       containers:
       - name: grad-dep
-        image: zainabsabry/test-grad:1.0
+        image: 10.20.5.6:9001/node-app-grad
         ports:
         - containerPort: 3000
         env:
@@ -41,3 +42,5 @@ spec:
             configMapKeyRef:
               name: grad-dep-env
               key: HOST
+      imagePullSecrets:
+      - name: nexus-cred-cd
