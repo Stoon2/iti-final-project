@@ -6,21 +6,26 @@ resource "kubernetes_pod" "nexus" {
       "app" = "nexus"
     }
   }
-
+  
   spec {
     container {
       image = "sonatype/nexus3"
       name  = "nexus"
-
-      volume_mount {
-        mount_path = "/sonatype-work"
-        name = "nexus-data"
-      }
-
-
+  
       port {
         container_port = 8081
       }
+    }
+
+    init_container {
+      name = "perms"
+      image = "busybox"
+      command = [ "sh", "-c", "chown -R 200:200 /nexus-data" ]
+      volume_mount {
+        name = "nexus-data"
+        mount_path = "/nexus-data"
+      }
+      
     }
 
     volume {
