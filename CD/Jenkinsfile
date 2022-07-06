@@ -11,11 +11,16 @@ pipeline {
   }
 
   stages {
+   
     stage('Deploy App to Kubernetes') {   
+      environment{
+        NEXUS_REPO = '$(cat ./repo-ip.txt)'
+      }
       steps {
         container('kubectl') {
           withCredentials([file(credentialsId: 'mykubeconfig', variable: 'KUBECONFIG')]) {
             sh 'kubectl apply -f k8s/'
+            sh "kubectl set image deployment -n dev grad-dep grad-dep=${NEXUS_REPO}:9001/node-app-grad"
           }
         }
       }
